@@ -862,26 +862,41 @@ cmd_find (ServerContext *ctx, GHashTable *args, GError **err)
 
 
 #ifdef BUILD_GUILE
+
+#include <libguile.h>
+
 static MuError
-cmd_guile (ServerContext *ctx, GHashTable *args, GError **err)
-{ const char *script, *file;
+cmd_guile (ServerContext * ctx, GHashTable * args, GError ** err)
+{ int maxnum;
+  MuMsgFieldId sortfield;
+  const char *querystr;
+  MuQueryFlags qflags;
 
-  script = get_string_from_args (args, "script", TRUE, NULL);
-  file   = get_string_from_args (args, "file", TRUE, NULL);
+  char *res;
+  SCM func;
+  SCM func_symbol;
 
-  if (!script == !file)
-  { print_error (MU_ERROR_IN_PARAMETERS,
-                 "guile: must provide one of 'script', 'file'");
+  GET_STRING_OR_ERROR_RETURN (args, "query", &querystr, err);
+  if (get_find_params (args, &sortfield, &maxnum, &qflags, err) != MU_OK)
+  { print_and_clear_g_error (err);
     return MU_OK; }
 
+  /* Call a procedure that takes one argument */
+  func_symbol = scm_c_lookup ("mu:handle-query");
+  func = scm_variable_ref (func_symbol);
+
+  res = scm_to_utf8_string (scm_call_1
+                            (func, scm_from_utf8_string (querystr)));
+
+  print_expr (res);
+
   return MU_OK; }
-#else /*!BUILD_GUILE*/
+#else /*!BUILD_GUILE */
 static MuError
-cmd_guile (ServerContext *ctx, GHashTable *args, GError **err)
-{ print_error (MU_ERROR_INTERNAL,
-               "this mu does not have guile support");
+cmd_guile (ServerContext * ctx, GHashTable * args, GError ** err)
+{ print_error (MU_ERROR_INTERNAL, "this mu does not have guile support");
   return MU_OK; }
-#endif /*BUILD_GUILE*/
+#endif /*BUILD_GUILE */
 
 
 

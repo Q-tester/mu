@@ -79,6 +79,11 @@
     ;; mu:save
     ;; mu:save-as
     ))
+(define (mu:guile-server-init)
+  (string-append (getenv "HOME")
+		 "/.mu/mu-init.scm"))
+
+(mu:guile-server-init)
 
 ;; this is needed for guile < 2.0.4
 (setlocale LC_ALL "")

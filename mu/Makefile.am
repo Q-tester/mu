@@ -27,7 +27,7 @@ AM_CPPFLAGS=-I${top_srcdir}/lib $(GLIB_CFLAGS)
 # really need all the params they get
 AM_CFLAGS=-Wall -Wextra -Wno-unused-parameter -Wdeclaration-after-statement \
 	-pedantic -Wno-variadic-macros \
-        -DMU_SCRIPTS_DIR="\"$(pkgdatadir)/scripts/\""
+        -DMU_SCRIPTS_DIR="\"$(pkgdatadir)/scripts/\"" $(GUILE_CFLAGS)
 AM_CXXFLAGS=-Wall -Wextra -Wno-unused-parameter
 
 bin_PROGRAMS=				\
